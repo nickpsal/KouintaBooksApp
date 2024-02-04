@@ -1,11 +1,11 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-<PageTitle>Kouinta Books App</PageTitle>
 
+<PageTitle>Kouinta Books App</PageTitle>
 <h1>Kouinta Books List</h1>
 <div class="card-body">
     <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
-    <button>Add</button>
+    <button @onclick="NewBookHandle">Add</button>
     <table class="table table-striped table table-bordered">
         <thead>
              <tr>
@@ -33,8 +33,8 @@
                     <td>@book.finalBookPrice.ToString("F2")</td>
                     <td>@book.ISBN</td>
                     <td>
-                        <button>Edit</button>
-                        <button>Delete</button>
+                        <button @onclick="() => EditBookHandle(book.BookID)">Edit</button>
+                        <button @onclick="() => DeleteBookHandle(book.BookID)">Delete</button>
                     </td>
                 </tr>
             }
@@ -48,16 +48,25 @@
     private bool isAscending = true;
     private string searchInput = string.Empty;
 
-
     protected override async Task OnInitializedAsync()
     {
-        books = await LoadBooks();
+        books = await bookrepo.GetAllBooksAsync();
         books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
     }
 
-    private async Task<List<KouintaBook>> LoadBooks()
+    private void NewBookHandle()
     {
-        return await bookrepo.GetAllBooksAsync();
+        navManager.NavigateTo("/book/new");
+    }
+
+    private void EditBookHandle(int BookID)
+    {
+        navManager.NavigateTo($"/book/edit/{BookID}");
+    }
+
+    private async Task DeleteBookHandle(int BookID)
+    {
+        await bookrepo.DeleteBookAsync(BookID);
     }
 
     private void SortBooksByHeader(string orderByField)

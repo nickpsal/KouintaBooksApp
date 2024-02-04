@@ -1,0 +1,102 @@
+﻿@page "/book/edit"
+@page "/book/edit/{BookID}"
+
+<PageTitle>Edit Book: @formData.bookTitle</PageTitle>
+<EditForm Model="@formData" OnValidSubmit="HandleFormSubmit" formname="EditBookForm">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="bookTitle">Book Title:</label>
+        <InputText id="bookTitle" @bind-Value="formData.bookTitle" class="form-control" />
+        <ValidationMessage For="@(() => formData.bookTitle)" />
+    </div>
+    <div class="form-group">
+        <label for="publisherName">Publisher Name:</label>
+        <InputText id="publisherName" @bind-Value="formData.publisherName" class="form-control" />
+        <ValidationMessage For="@(() => formData.publisherName)" />
+    </div>
+    <div class="form-group">
+        <label for="bookYear">Book Year:</label>
+        <InputText id="bookYear" @bind-Value="formData.bookYear" class="form-control" />
+        <ValidationMessage For="@(() => formData.bookYear)" />
+    </div>
+    <div class="form-group">
+        <label for="bookPrice">Book Price With Vat:</label>
+        <InputText id="bookPrice" @bind-Value="formData.bookPrice" class="form-control" />
+        <ValidationMessage For="@(() => formData.bookPrice)" />
+    </div>
+     <div class="form-group">
+        <label for="FinalPriceNoVat">Final Price No Vat:</label>
+        <InputText id="FinalPriceNoVat" @bind-Value="formData.FinalPriceNoVat" class="form-control" readonly />
+        <ValidationMessage For="@(() => formData.FinalPriceNoVat)" />
+    </div>
+    <div class="form-group">
+        <label for="FinalPriceWithVat">Final Price With Vat:</label>
+        <InputText id="FinalPriceWithVat" @bind-Value="formData.FinalPriceWithVat" class="form-control" readonly />
+        <ValidationMessage For="@(() => formData.FinalPriceWithVat)" />
+    </div>
+    <div class="form-group">
+        <label for="ISBN">ISBN:</label>
+        <InputText id="ISBN" @bind-Value="formData.ISBN" class="form-control" />
+        <ValidationMessage For="@(() => formData.ISBN)" />
+    </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? BookID { get; set; }
+    private FormData formData = new();
+    private int Id;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int.TryParse(BookID, out Id);
+        KouintaBook editBook = await bookrepo.GetBookByID(Id);
+        formData.bookTitle = editBook.bookTitle;
+        formData.publisherName = editBook.publisherName;
+        formData.bookYear = editBook.bookYear.ToString();
+        formData.bookPrice = editBook.bookPriceWVatND.ToString("F2");
+        formData.FinalPriceNoVat = editBook.finalBookPriceNoVat.ToString("F2");
+        formData.FinalPriceWithVat = editBook.finalBookPrice.ToString("F2");
+        formData.ISBN = editBook.ISBN;
+    }
+
+    private class FormData
+    {
+        [Required(ErrorMessage = "book Title is required")]
+        public string bookTitle { get; set; } = string.Empty;
+        [Required(ErrorMessage = "publisher Name is required")]
+        public string publisherName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "book Year is required")]
+        [StringLength(4, ErrorMessage = "Field must have exactly 4 characters.")]
+        [RegularExpression("^[0-9]{4}$", ErrorMessage = "Field must be a 4-digit number.")]
+        public string bookYear { get; set; } = string.Empty;
+        [Required(ErrorMessage = "book Price With Vat is required")]
+        public string bookPrice { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Final Price No Vat is required")]
+        public string FinalPriceNoVat { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Final Price With Vat is required")]
+        public string FinalPriceWithVat { get; set; } = string.Empty;
+        [Required(ErrorMessage = "ISBN is required")]
+        public string ISBN { get; set; } = string.Empty;
+    }
+
+    private async Task HandleFormSubmit()
+    {
+        float.TryParse(formData.bookPrice, out float bookPriceWithVAT);
+        int.TryParse(formData.bookYear, out int BookYear);
+        float FinalPriceWithVat = bookPriceWithVAT - (bookPriceWithVAT * 30 / 100);
+        float FinalPriceNoVat = (float)(FinalPriceWithVat / 1.06);
+        KouintaBook newBook = new()
+        {
+            bookTitle = formData.bookTitle,
+            publisherName = formData.publisherName,
+            bookYear = BookYear,
+            bookPriceWVatND = bookPriceWithVAT,
+            finalBookPrice = FinalPriceWithVat,
+            finalBookPriceNoVat = FinalPriceNoVat
+        };
+        await bookrepo.UpdateBookAsync(newBook);
+        navManager.NavigateTo("/");
+    }
+}
