@@ -1,0 +1,185 @@
+﻿@page "/"
+@rendermode InteractiveServer
+<PageTitle>Kouinta Books App</PageTitle>
+
+<h1>Kouinta Books List</h1>
+<div class="card-body">
+    <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
+    <button>Add</button>
+    <table class="table table-striped table table-bordered">
+        <thead>
+             <tr>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("BookID")'>Id @RenderSortArrow("BookID")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("bookTitle")'>Title @RenderSortArrow("bookTitle")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("publisherName")'>Publisher @RenderSortArrow("publisherName")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("bookYear")'>Year @RenderSortArrow("bookYear")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("bookPriceWVatND")'>Book Priced @RenderSortArrow("bookPriceWVatND")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("finalBookPriceNoVat")'>Final Price w VAT @RenderSortArrow("finalBookPriceNoVat")</th>
+                 <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("finalBookPrice")'>Final Price incl VAT @RenderSortArrow("finalBookPrice")</th>
+                 <th style="cursor: pointer;">ISBN</th>
+                 <th style="cursor: pointer;">Actions</th>
+             </tr>
+         </thead>
+         <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.BookID</td>
+                    <td>@book.bookTitle</td>
+                    <td>@book.publisherName</td>
+                    <td>@book.bookYear</td>
+                    <td>@book.bookPriceWVatND.ToString("F2")</td>
+                    <td>@book.finalBookPriceNoVat.ToString("F2")</td>
+                    <td>@book.finalBookPrice.ToString("F2")</td>
+                    <td>@book.ISBN</td>
+                    <td>
+                        <button>Edit</button>
+                        <button>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+     </table>
+ </div>
+
+@code{
+    private List<KouintaBook> books = SharedServices.books;
+    private string currentSortField = string.Empty;
+    private bool isAscending = true;
+    private string searchInput = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await LoadBooks();
+        books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
+    }
+
+    private async Task<List<KouintaBook>> LoadBooks()
+    {
+        return await bookrepo.GetAllBooksAsync();
+    }
+
+    private void SortBooksByHeader(string orderByField)
+    {
+        if (currentSortField == orderByField)
+        {
+            isAscending = !isAscending;
+        }
+        else
+        {
+            currentSortField = orderByField;
+            isAscending = true;
+        }
+        SortBooks(orderByField);
+    }
+
+    private void SortBooks(string orderByField)
+    {
+        if (orderByField == "BookID")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.BookID).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.BookID).ToList();
+            }
+        }
+        if (orderByField == "bookTitle")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.bookTitle).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.bookTitle).ToList();
+            }
+        }
+        else if (orderByField == "publisherName")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.publisherName).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.publisherName).ToList();
+            }
+        }
+        else if (orderByField == "bookYear")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.bookYear).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.bookYear).ToList();
+            }
+        }
+        else if (orderByField == "bookPriceWVatND")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.bookPriceWVatND).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.bookPriceWVatND).ToList();
+            }
+        }
+        else if (orderByField == "finalBookPriceNoVat")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.finalBookPriceNoVat).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.finalBookPriceNoVat).ToList();
+            }
+        }
+        else if (orderByField == "finalBookPrice")
+        {
+            if (isAscending)
+            {
+                books = books.OrderBy(x => x.finalBookPrice).ToList();
+            }
+            else
+            {
+                books = books.OrderByDescending(x => x.finalBookPrice).ToList();
+            }
+        }
+    }
+
+    private string RenderSortArrow(string field)
+    {
+        if (currentSortField == field)
+        {
+            if (isAscending)
+            {
+                return " ▲";
+            }
+            else
+            {
+                return " ▼";
+            }
+        }
+        return string.Empty;
+    }
+
+    private void HandleSearch()
+    {
+        if (!string.IsNullOrEmpty(searchInput))
+        {
+            books = books.Where(x => x.bookTitle.Contains(searchInput, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
+        }
+    }
+}
