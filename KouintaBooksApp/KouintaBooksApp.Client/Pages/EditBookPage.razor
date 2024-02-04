@@ -46,12 +46,10 @@
     [Parameter]
     public string? BookID { get; set; }
     private FormData formData = new();
-    private int Id;
 
     protected override async Task OnInitializedAsync()
     {
-        int.TryParse(BookID, out Id);
-        KouintaBook editBook = await bookrepo.GetBookByID(Id);
+        KouintaBook editBook = await bookrepo.GetBookByID(int.Parse(BookID!));
         formData.bookTitle = editBook.bookTitle;
         formData.publisherName = editBook.publisherName;
         formData.bookYear = editBook.bookYear.ToString();
