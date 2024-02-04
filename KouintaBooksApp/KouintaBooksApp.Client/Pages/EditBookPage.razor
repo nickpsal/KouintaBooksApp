@@ -39,17 +39,18 @@
         <InputText id="ISBN" @bind-Value="formData.ISBN" class="form-control" />
         <ValidationMessage For="@(() => formData.ISBN)" />
     </div>
-    <button class="btn btn-primary" type="submit">Submit</button>
+    <button @onclick="HandleFormSubmit" class="btn btn-primary" type="submit">Submit</button>
+    <button @onclick="HandleReturn" class="btn btn-primary" type="submit">Return</button>
 </EditForm>
 
 @code {
     [Parameter]
-    public string? BookID { get; set; }
+    public required string BookID { get; set; }
     private FormData formData = new();
 
     protected override async Task OnInitializedAsync()
     {
-        KouintaBook editBook = await bookrepo.GetBookByID(int.Parse(BookID!));
+        KouintaBook editBook = await bookrepo.GetBookByID(int.Parse(BookID));
         formData.bookTitle = editBook.bookTitle;
         formData.publisherName = editBook.publisherName;
         formData.bookYear = editBook.bookYear.ToString();
@@ -95,6 +96,11 @@
             finalBookPriceNoVat = FinalPriceNoVat
         };
         await bookrepo.UpdateBookAsync(newBook);
+        navManager.NavigateTo("/");
+    }
+
+    private void HandleReturn()
+    {
         navManager.NavigateTo("/");
     }
 }
