@@ -1,6 +1,7 @@
 ﻿using KouintaBooksApp.Data;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using Shared.BookRepositories;
 using Shared.Models;
 using SharedLibrary.SeedRepositories;
 using SharedLibrary.SharedRepo;
@@ -10,11 +11,13 @@ namespace KouintaBooksApp.Implementations
     public class SeedRepo : ISeedService
     {
         private readonly AppDbContext dbContext;
+        private readonly IBookRepo bookRepo;
 
-        public SeedRepo(AppDbContext dbContext)
+        public SeedRepo(AppDbContext dbContext, IBookRepo bookRepo)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             this.dbContext = dbContext;
+            this.bookRepo = bookRepo;
         }
 
         private async Task MigrateDatabaseAsync()
@@ -28,7 +31,7 @@ namespace KouintaBooksApp.Implementations
 #endif
         }
 
-        public List<KouintaBook> ReadDataFromExcel()
+        public async Task<List<KouintaBook>> ReadDataFromExcel()
         {
             string filePath = "Data/books.xlsx";
             List<KouintaBook> bookList = new();
@@ -58,6 +61,7 @@ namespace KouintaBooksApp.Implementations
                             finalBookPrice = finalBookPrice,
                             ISBN = ISBN
                         };
+                        await bookRepo.AddBookAsync(book);
                     }
                 }
                 return bookList;
@@ -77,14 +81,9 @@ namespace KouintaBooksApp.Implementations
         public async Task SeedDataAsync()
         {
             await MigrateDatabaseAsync();
-            if (dbContext.KouintaBooks.ToList().Count == 0)
+            if (dbContext.KouintaBooks.ToList().Count == 0 )
             {
-                SharedServices.books = ReadDataFromExcel();
-                foreach (var book in SharedServices.books)
-                {
-                    await dbContext.KouintaBooks.AddAsync(book);
-                }
-                await dbContext.SaveChangesAsync();
+                SharedServices.books = await ReadDataFromExcel();
             }
         }
     }

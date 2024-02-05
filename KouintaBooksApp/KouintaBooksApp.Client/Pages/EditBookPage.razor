@@ -1,5 +1,6 @@
 ﻿@page "/book/edit"
 @page "/book/edit/{BookID}"
+@rendermode InteractiveServer
 
 <PageTitle>Edit Book: @formData.bookTitle</PageTitle>
 <EditForm Model="@formData" OnValidSubmit="HandleFormSubmit" formname="EditBookForm">
@@ -43,14 +44,15 @@
     <button @onclick="HandleReturn" class="btn btn-primary" type="submit">Return</button>
 </EditForm>
 
-@code {
+    @code {
     [Parameter]
     public required string BookID { get; set; }
     private FormData formData = new();
+    private KouintaBook? editBook;
 
     protected override async Task OnInitializedAsync()
     {
-        KouintaBook editBook = await bookrepo.GetBookByID(int.Parse(BookID));
+        editBook = await bookrepo.GetBookByID(int.Parse(BookID));
         formData.bookTitle = editBook.bookTitle;
         formData.publisherName = editBook.publisherName;
         formData.bookYear = editBook.bookYear.ToString();
@@ -86,16 +88,13 @@
         int.TryParse(formData.bookYear, out int BookYear);
         float FinalPriceWithVat = bookPriceWithVAT - (bookPriceWithVAT * 30 / 100);
         float FinalPriceNoVat = (float)(FinalPriceWithVat / 1.06);
-        KouintaBook newBook = new()
-        {
-            bookTitle = formData.bookTitle,
-            publisherName = formData.publisherName,
-            bookYear = BookYear,
-            bookPriceWVatND = bookPriceWithVAT,
-            finalBookPrice = FinalPriceWithVat,
-            finalBookPriceNoVat = FinalPriceNoVat
-        };
-        await bookrepo.UpdateBookAsync(newBook);
+        editBook!.bookTitle = formData.bookTitle;
+        editBook.publisherName = formData.publisherName;
+        editBook.bookYear = BookYear;
+        editBook.bookPriceWVatND = bookPriceWithVAT;
+        editBook.finalBookPrice = FinalPriceWithVat;
+        editBook.finalBookPriceNoVat = FinalPriceNoVat;
+        await bookrepo.UpdateBookAsync(editBook);
         navManager.NavigateTo("/");
     }
 
