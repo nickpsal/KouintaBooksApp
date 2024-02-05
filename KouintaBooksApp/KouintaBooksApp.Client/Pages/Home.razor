@@ -6,6 +6,7 @@
 <div class="card-body">
     <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
     <button @onclick="NewBookHandle">Add</button>
+    <button>Export to PDF</button>
     <table class="table table-striped table table-bordered">
         <thead>
              <tr>
@@ -17,7 +18,7 @@
                  <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("finalBookPriceNoVat")'>Final Price w VAT @RenderSortArrow("finalBookPriceNoVat")</th>
                  <th style="cursor: pointer;" @onclick='() => SortBooksByHeader("finalBookPrice")'>Final Price incl VAT @RenderSortArrow("finalBookPrice")</th>
                  <th style="cursor: pointer;">ISBN</th>
-                 <th style="cursor: pointer;">Actions</th>
+                 <th>Actions</th>
              </tr>
          </thead>
          <tbody>
@@ -91,82 +92,19 @@
 
     private void SortBooks(string orderByField)
     {
-        if (orderByField == "BookID")
+        var property = typeof(KouintaBook).GetProperty(orderByField, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        if (property == null)
         {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.BookID).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.BookID).ToList();
-            }
+            // Handle the case where the property is not found
+            return;
         }
-        if (orderByField == "bookTitle")
+        if (isAscending)
         {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.bookTitle).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.bookTitle).ToList();
-            }
+            books = books.OrderBy(x => property.GetValue(x, null)).ToList();
         }
-        else if (orderByField == "publisherName")
+        else
         {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.publisherName).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.publisherName).ToList();
-            }
-        }
-        else if (orderByField == "bookYear")
-        {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.bookYear).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.bookYear).ToList();
-            }
-        }
-        else if (orderByField == "bookPriceWVatND")
-        {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.bookPriceWVatND).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.bookPriceWVatND).ToList();
-            }
-        }
-        else if (orderByField == "finalBookPriceNoVat")
-        {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.finalBookPriceNoVat).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.finalBookPriceNoVat).ToList();
-            }
-        }
-        else if (orderByField == "finalBookPrice")
-        {
-            if (isAscending)
-            {
-                books = books.OrderBy(x => x.finalBookPrice).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(x => x.finalBookPrice).ToList();
-            }
+            books = books.OrderByDescending(x => property.GetValue(x, null)).ToList();
         }
     }
 
