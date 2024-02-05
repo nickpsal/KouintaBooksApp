@@ -64,8 +64,8 @@ namespace KouintaBooksApp.Implementations
             UpdateBook.bookPriceWVatND = model.bookPriceWVatND;
             UpdateBook.finalBookPriceNoVat = model.bookPriceWVatND;
             UpdateBook.finalBookPrice = model.finalBookPrice;
-            KouintaBook? updatedBook =  await DbContext.KouintaBooks.FirstOrDefaultAsync(b => b.BookID == model.BookID);
-            return updatedBook!;
+            var updatedData =  await DbContext.KouintaBooks.FirstOrDefaultAsync(b => b.BookID == model.BookID);
+            return updatedData!;
         }
     }
 }

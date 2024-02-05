@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 
 <PageTitle>Insert New Book</PageTitle>
-<EditForm Model="@formData" OnValidSubmit="HandleFormSubmit" formname="newTaskForm">
+<EditForm Model="@formData" OnValidSubmit="HandleFormSubmit" formname="NewBookForm">
     <DataAnnotationsValidator />
     <div class="form-group">
         <label for="bookTitle">Book Title:</label>
@@ -34,7 +34,7 @@
 
 @code {
     private FormData formData = new();
-    private KouintaBook? newBook;
+    private KouintaBook newBook = new();
     private class FormData
     {
         [Required(ErrorMessage = "book Title is required")]
@@ -42,8 +42,6 @@
         [Required(ErrorMessage = "publisher Name is required")]
         public string publisherName { get; set; } = string.Empty;
         [Required(ErrorMessage = "book Year is required")]
-        [StringLength(4, ErrorMessage = "Field must have exactly 4 characters.")]
-        [RegularExpression("^[0-9]{4}$", ErrorMessage = "Field must be a 4-digit number.")]
         public string bookYear { get; set; } = string.Empty;
         [Required(ErrorMessage = "book Price With Vat is required")]
         public string bookPrice { get; set; } = string.Empty;
@@ -58,12 +56,12 @@
         float FinalPriceWithVat = bookPriceWithVAT - (bookPriceWithVAT * 30 / 100);
         float FinalPriceNoVat = (float)(FinalPriceWithVat / 1.06);
         newBook.bookTitle = formData.bookTitle;
-        newBook.bookTitle = formData.bookTitle;
         newBook.publisherName = formData.publisherName;
         newBook.bookYear = BookYear;
         newBook.bookPriceWVatND = bookPriceWithVAT;
         newBook.finalBookPrice = FinalPriceWithVat;
         newBook.finalBookPriceNoVat = FinalPriceNoVat;
+        newBook.ISBN = formData.ISBN;
         await bookrepo.AddBookAsync(newBook);
         navManager.NavigateTo("/");
     }

@@ -50,6 +50,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await UpdateTableData();
+    }
+
+    private async Task UpdateTableData()
+    {
         books = await bookrepo.GetAllBooksAsync();
         books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
     }
@@ -67,6 +72,7 @@
     private async Task DeleteBookHandle(int BookID)
     {
         await bookrepo.DeleteBookAsync(BookID);
+        await UpdateTableData();
     }
 
     private void SortBooksByHeader(string orderByField)
