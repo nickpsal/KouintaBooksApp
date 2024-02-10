@@ -3,7 +3,6 @@ using KouintaBooksApp.Data;
 using KouintaBooksApp.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Shared.BookRepositories;
-using SharedLibrary.BookRepositories;
 using SharedLibrary.SharedRepo;
 
 var builder = WebApplication.CreateBuilder(args);
