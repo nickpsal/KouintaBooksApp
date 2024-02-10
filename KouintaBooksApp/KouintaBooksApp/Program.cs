@@ -1,11 +1,8 @@
-using KouintaBooksApp.Client.Pages;
 using KouintaBooksApp.Components;
 using KouintaBooksApp.Data;
 using KouintaBooksApp.Implementations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Shared.BookRepositories;
-using SharedLibrary.SeedRepositories;
 using SharedLibrary.SharedRepo;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +24,6 @@ builder.Services.AddControllers();
 //Implementations
 builder.Services.AddScoped<IBookRepo, BookRepo>();
 builder.Services.AddSingleton<SharedServices>();
-builder.Services.AddTransient<ISeedService, SeedRepo>();
 
 //Database Connection
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -35,8 +31,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-//Seed Service run
-await SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,6 +52,13 @@ app.MapControllers();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+// Apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
@@ -65,10 +66,3 @@ app.MapRazorComponents<App>()
 
 app.Run();
 
-//run each time the App starts
-static async Task SeedAsync(IServiceProvider services)
-{
-    var scope = services.CreateScope();
-    var seedService = scope.ServiceProvider.GetRequiredService<ISeedService>();
-    await seedService.SeedDataAsync();
-}
