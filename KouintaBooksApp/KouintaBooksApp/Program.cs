@@ -3,6 +3,7 @@ using KouintaBooksApp.Data;
 using KouintaBooksApp.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Shared.BookRepositories;
+using SharedLibrary.BookRepositories;
 using SharedLibrary.SharedRepo;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +24,7 @@ builder.Services.AddControllers();
 
 //Implementations
 builder.Services.AddScoped<IBookRepo, BookRepo>();
-builder.Services.AddSingleton<SharedServices>();
+builder.Services.AddScoped<IExportData, ExportData>();
 
 //Database Connection
 builder.Services.AddDbContext<AppDbContext>(options =>

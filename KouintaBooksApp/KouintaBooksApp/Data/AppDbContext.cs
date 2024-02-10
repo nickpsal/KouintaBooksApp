@@ -11,7 +11,7 @@ namespace KouintaBooksApp.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
         public DbSet<KouintaBook> KouintaBooks { get; set; }

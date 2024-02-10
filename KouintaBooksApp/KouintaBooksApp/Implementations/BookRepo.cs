@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.BookRepositories;
 using Shared.Models;
+using SharedLibrary.SharedRepo;
 
 namespace KouintaBooksApp.Implementations
 {

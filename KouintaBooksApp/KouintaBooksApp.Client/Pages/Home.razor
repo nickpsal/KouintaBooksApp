@@ -6,7 +6,7 @@
 <div class="card-body">
     <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
     <button @onclick="NewBookHandle">Add</button>
-    <button>Export to PDF</button>
+    <button @onclick="ExportDataToPDF">Export to PDF</button>
     <table class="table table-striped table table-bordered">
         <thead>
              <tr>
@@ -22,7 +22,7 @@
              </tr>
          </thead>
          <tbody>
-            @foreach (var book in books)
+            @foreach (var book in SharedServices.books)
             {
                 <tr>
                     <td>@book.BookID</td>
@@ -44,7 +44,6 @@
  </div>
 
 @code{
-    private List<KouintaBook> books = SharedServices.books;
     private string currentSortField = string.Empty;
     private bool isAscending = true;
     private string searchInput = string.Empty;
@@ -56,8 +55,8 @@
 
     private async Task UpdateTableData()
     {
-        books = await bookrepo.GetAllBooksAsync();
-        books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
+        SharedServices.books = await bookrepo.GetAllBooksAsync();
+        SharedServices.books = SharedServices.books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
     }
 
     private void NewBookHandle()
@@ -74,6 +73,11 @@
     {
         await bookrepo.DeleteBookAsync(BookID);
         await UpdateTableData();
+    }
+
+    private async Task ExportDataToPDF()
+    {
+        await exportData.ExportToPDFAsync();
     }
 
     private void SortBooksByHeader(string orderByField)
@@ -100,11 +104,11 @@
         }
         if (isAscending)
         {
-            books = books.OrderBy(x => property.GetValue(x, null)).ToList();
+            SharedServices.books = SharedServices.books.OrderBy(x => property.GetValue(x, null)).ToList();
         }
         else
         {
-            books = books.OrderByDescending(x => property.GetValue(x, null)).ToList();
+            SharedServices.books = SharedServices.books.OrderByDescending(x => property.GetValue(x, null)).ToList();
         }
     }
 
@@ -128,11 +132,11 @@
     {
         if (!string.IsNullOrEmpty(searchInput))
         {
-            books = books.Where(x => x.bookTitle.Contains(searchInput, StringComparison.OrdinalIgnoreCase)).ToList();
+            SharedServices.books = SharedServices.books.Where(x => x.bookTitle.Contains(searchInput, StringComparison.OrdinalIgnoreCase)).ToList();
         }
         else
         {
-            books = books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
+            SharedServices.books = SharedServices.books.OrderBy(x => x.bookYear).ThenBy(x => x.bookPriceWVatND).ToList();
         }
     }
 }
