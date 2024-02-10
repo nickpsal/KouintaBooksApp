@@ -24,7 +24,6 @@ builder.Services.AddControllers();
 
 //Implementations
 builder.Services.AddScoped<IBookRepo, BookRepo>();
-builder.Services.AddScoped<IExportData, ExportData>();
 
 //Database Connection
 builder.Services.AddDbContext<AppDbContext>(options =>
