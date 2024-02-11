@@ -9,9 +9,11 @@
 @using KouintaBooksApp.Client
 @using Shared.BookRepositories
 @using Shared.Models
+@using SharedLibrary.BookRepositories
 @using SharedLibrary.SharedRepo
 @using System.ComponentModel.DataAnnotations
 @using System.Reflection
 
 @inject IBookRepo bookrepo
 @inject NavigationManager navManager
+@inject IExportData exportData

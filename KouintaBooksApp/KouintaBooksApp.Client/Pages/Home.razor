@@ -6,7 +6,7 @@
 <div class="card-body">
     <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
     <button @onclick="NewBookHandle">Add</button>
-    <button @onclick="ExportDataToPDF">Export to PDF</button>
+    <button @onclick="ExportBookToPDFHandle">Export to PDF</button>
     <table class="table table-striped table table-bordered">
         <thead>
              <tr>
@@ -75,7 +75,7 @@
         await UpdateTableData();
     }
 
-    private async Task ExportDataToPDF()
+    private void ExportBookToPDFHandle()
     {
         
     }
