@@ -3,13 +3,9 @@ using KouintaBooksApp.Data;
 using KouintaBooksApp.Implementations;
 using Microsoft.EntityFrameworkCore;
 using Shared.BookRepositories;
-using SharedLibrary.BookRepositories;
 using SharedLibrary.SharedRepo;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//SyncFusion license key
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -27,7 +23,6 @@ builder.Services.AddControllers();
 
 //Implementations
 builder.Services.AddScoped<IBookRepo, BookRepo>();
-builder.Services.AddScoped<IExportData, ExportData>();
 
 //Database Connection
 builder.Services.AddDbContext<AppDbContext>(options =>

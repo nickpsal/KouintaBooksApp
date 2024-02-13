@@ -6,7 +6,6 @@
 <div class="card-body">
     <label>Search by Title</label><InputText @bind-Value="searchInput" /><button @onclick="HandleSearch">Search</button>
     <button @onclick="NewBookHandle">Add</button>
-    <button @onclick="ExportBookToPDFHandle">Export to PDF</button>
     <table class="table table-striped table table-bordered">
         <thead>
              <tr>
@@ -73,11 +72,6 @@
     {
         await bookrepo.DeleteBookAsync(BookID);
         await UpdateTableData();
-    }
-
-    private void ExportBookToPDFHandle()
-    {
-        
     }
 
     private void SortBooksByHeader(string orderByField)
